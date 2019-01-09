@@ -1,9 +1,9 @@
 let arc = require('@architect/functions');
 let url = arc.http.helpers.url;
 
-module.exports = function _header (req) {
+module.exports = function _header (session, path) {
     let body = ``;
-    if (req.session && req.session.account && req.session.account.accountID) {
+    if (session && session.account && session.account.accountID) {
         body = `
   <div class=card-body>
     <a href=${url('/')}>Home</a>
@@ -11,7 +11,7 @@ module.exports = function _header (req) {
       <button type=submit class="btn btn-primary float-right m-4">Logout</button>
     </form>
   </div>`;
-    } else if (!req.path.includes('/signup')) {
+    } else if (!path.includes('/signup')) {
         body = `
   <div class=card-body>
 

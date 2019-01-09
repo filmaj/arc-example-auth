@@ -3,6 +3,7 @@ let layout = require('@architect/shared/views/layout');
 let url = arc.http.helpers.url;
 
 exports.handler = async function http (req) {
+    let session = await arc.http.session.read(req);
     let title = 'Sign Up';
     let body = `
     <div class="card mt-5 mr-auto ml-auto mb-1 w-25">
@@ -23,8 +24,8 @@ exports.handler = async function http (req) {
       </div>
     </div>`;
     return {
-        status: 203,
+        status: 200,
         type: 'text/html',
-        body: layout({body, title, req})
+        body: layout({body, title, session, path: '/signup'})
     };
 };

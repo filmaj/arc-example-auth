@@ -3,7 +3,7 @@ let data = require('@architect/data');
 let url = arc.http.helpers.url;
 let compare = require('bcryptjs').compareSync;
 
-async function login (req, res) {
+exports.handler = async function login (req) {
     let location = url('/');
     let session = {};
     try {
@@ -26,7 +26,9 @@ async function login (req, res) {
     } catch (e) {
         console.error(e);
     }
-    res({session, location});
-}
-
-exports.handler = arc.http(login);
+    return {
+        status: 302,
+        cookie: await arc.http.session.write(session),
+        location
+    };
+};

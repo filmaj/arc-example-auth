@@ -4,7 +4,7 @@ let url = arc.http.helpers.url;
 let hash = require('bcryptjs').hashSync;
 let salt_rounds = 12;
 
-async function create_account (req, res) {
+exports.handler = async function create_account (req) {
     console.log(req);
     let location = url('/');
     let session = {};
@@ -18,7 +18,9 @@ async function create_account (req, res) {
     } catch (e) {
         console.error(e);
     }
-    res({session, location});
-}
-
-exports.handler = arc.http(create_account);
+    return {
+        status: 302,
+        cookie: await arc.http.session.write(session),
+        location
+    };
+};

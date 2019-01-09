@@ -5,19 +5,25 @@ let auth = require('@architect/shared/middleware/auth');
 let url = arc.http.helpers.url;
 let form = require('./_form');
 
-async function route (req, res) {
+async function route (req) {
     let title = 'welcome home';
-  // wrangle the data
     let noteID = req.params.noteID;
-    let session = req.session;
+
+    let session = await arc.http.session.read(req);
     let accountID = session.account.accountID;
     let note = await data.notes.get({noteID, accountID});
-    note.href = url(`/notes/${noteID}`);
-  // build out the templates
+    let href = `/notes/${noteID}`;
+    note.href = url(href);
+    // build out the templates
     let body = form(note);
-    let html = layout({body, title, req});
-  // send the response
-    res({html});
+    let html = layout({body, title, session, path: href});
+    // send the response
+    return {
+        status: 200,
+        cookie: await arc.http.session.write(session),
+        type: 'text/html',
+        body: html
+    };
 }
 
-exports.handler = arc.http(auth, route);
+exports.handler = arc.middleware(auth, route);

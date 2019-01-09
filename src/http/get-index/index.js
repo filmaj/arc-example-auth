@@ -1,16 +1,15 @@
 let arc = require('@architect/functions');
+
 let data = require('@architect/data');
 let layout = require('@architect/shared/views/layout');
 let url = arc.http.helpers.url;
 let form = require('./_form');
 
 // logic for authenticated visitors
-async function authorized (req, res, next) {
-    if (!req.session.account) {
-        next();
-    } else {
-        let session = req.session;
-    // get all the notes
+async function authorized (req) {
+    let session = await arc.http.session.read(req);
+    if (session && session.account) {
+        // get all the notes
         let title = 'welcome home';
         let all = await data.notes.query({
             KeyConditionExpression: 'accountID = :accountID',
@@ -19,16 +18,16 @@ async function authorized (req, res, next) {
             }
         });
 
-    // add href to each note for the template link
+        // add href to each note for the template link
         let notes = all.Items.map(function addHref (note) {
             note.href = url(`/notes/${note.noteID}`);
             return note;
         });
 
-    // disambiguate URLs for envs
+        // disambiguate URLs for envs
         let createUrl = url('/notes');
 
-    // interpolate the template data
+        // interpolate the template data
         let body = form({url: createUrl});
         if (notes && notes.length) {
             body += `
@@ -37,18 +36,28 @@ async function authorized (req, res, next) {
       ${notes.map(make_note).join('\n  ')}
     </div>`;
         }
-        let html = layout({body, title, req});
+        let html = layout({body, title, session, path: '/'});
 
-        res({html});
+        return {
+            status: 200,
+            type: 'text/html; charset=utf8',
+            cookie: await arc.http.session.write(session),
+            body: html
+        };
     }
 }
 
 // shown for unauthenticated visitors
-function unauthorized (req, res) {
+async function unauthorized (req) {
     let title = 'welcome home';
     let body = '&nbsp;';
-    let html = layout({body, title, req});
-    res({html});
+    let session = await arc.http.session.read(req);
+    let html = layout({body, title, session, path: '/'});
+    return {
+        status: 200,
+        type: 'text/html; charset=utf8',
+        body: html
+    };
 }
 
 function make_note ({title, body, href}) {
@@ -60,4 +69,4 @@ function make_note ({title, body, href}) {
 `;
 }
 
-exports.handler = arc.http(authorized, unauthorized);
+exports.handler = arc.middleware(authorized, unauthorized);

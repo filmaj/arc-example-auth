@@ -4,8 +4,7 @@ module.exports = function layout (params = {}) {
     console.log('layout params:', params);
     let body = params.body || 'hello world';
     let title = params.title || '@architect/data demo';
-    let req = params.req;
-    let session = req && req.session || {};
+    let session = params.session;
     return `
 <!doctype html>
 <html lang=en>
@@ -19,7 +18,7 @@ module.exports = function layout (params = {}) {
     <title>${title}</title>
   </head>
   <body>
-    ${auth(req)}
+    ${auth(session)}
     ${body}
   </body>
 </html>
