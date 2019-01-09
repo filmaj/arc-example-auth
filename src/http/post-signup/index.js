@@ -1,7 +1,7 @@
 let arc = require('@architect/functions');
 let data = require('@architect/data');
 let url = arc.http.helpers.url;
-let bcrypt = require('bcrypt');
+let hash = require('bcryptjs').hashSync;
 let salt_rounds = 12;
 
 async function create_account (req, res) {
@@ -10,8 +10,8 @@ async function create_account (req, res) {
     let session = {};
     try {
         let password = req.body.password;
-        let hash = await bcrypt.hash(password, salt_rounds);
-        let account = {accountID: req.body.email, hash};
+        let hashed = hash(password, salt_rounds);
+        let account = {accountID: req.body.email, hash: hashed};
         session.account = account;
         let result = await data.accounts.put(account);
         console.log(result);
