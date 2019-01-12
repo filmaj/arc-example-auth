@@ -5,7 +5,7 @@ let compare = require('bcryptjs').compareSync;
 
 exports.handler = async function login (req) {
     let location = url('/');
-    let session = {};
+    let session = await arc.http.session.read(req);
     try {
         let result = await data.accounts.query({
             KeyConditionExpression: 'accountID = :accountID',
