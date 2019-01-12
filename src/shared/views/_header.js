@@ -29,5 +29,9 @@ module.exports = function _header (session, path) {
     <p class=float-right>or <a href=${url('/signup')}>Sign Up</a></p>
   </div>`;
     }
-    return `<div class="card mt-5 mr-auto ml-auto mb-1 w-25">${body}</div>`;
+    if (body.length) {
+        return `<div class="card mt-5 mr-auto ml-auto mb-1 w-25">${body}</div>`;
+    } else {
+        return ``;
+    }
 };

@@ -5,6 +5,7 @@ module.exports = function layout (params = {}) {
     let body = params.body || 'hello world';
     let title = params.title || '@architect/data demo';
     let session = params.session;
+    let path = params.path;
     return `
 <!doctype html>
 <html lang=en>
@@ -18,7 +19,7 @@ module.exports = function layout (params = {}) {
     <title>${title}</title>
   </head>
   <body>
-    ${auth(session)}
+    ${auth(session, path)}
     ${body}
   </body>
 </html>

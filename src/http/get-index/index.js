@@ -51,6 +51,9 @@ async function authorized (req) {
 async function unauthorized (req) {
     let title = 'welcome home';
     let body = '&nbsp;';
+    if (req.query && req.query.plzauth) {
+        body = '<div class="card mt-5 mr-auto ml-auto mb-1 w-25"><p>tsk tsk, you need to login to access that!</p></div>';
+    }
     let session = await arc.http.session.read(req);
     let html = layout({body, title, session, path: '/'});
     return {

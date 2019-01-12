@@ -7,8 +7,7 @@ module.exports = async function auth (req) {
     if (!session || !session.account) {
         return {
             status: 302,
-            cookie: await arc.http.session.write(req),
-            location: url('/')
+            location: url('/?plzauth=1')
         };
     }
 };
