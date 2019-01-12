@@ -7,6 +7,7 @@ async function route (req) {
     let session = await arc.http.session.read(req);
     try {
         let note = req.body;
+        // TODO: what if body is empty?
         note.accountID = session.account.accountID;
         note.updated = new Date(Date.now()).toISOString();
         // save the note

@@ -6,6 +6,7 @@ exports.handler = async function route (req) {
     let noteID = req.params.noteID;
     let session = await arc.http.session.read(req);
     let accountID = session.account.accountID;
+    // TODO: what happens if this fails?
     await data.notes.delete({
         noteID, accountID
     });
