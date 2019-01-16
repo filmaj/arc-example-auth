@@ -1,6 +1,7 @@
 let arc = require('@architect/functions');
 let data = require('@architect/data');
 let url = arc.http.helpers.url;
+let error = require('@architect/shared/http_error');
 let compare = require('bcryptjs').compareSync;
 
 exports.handler = async function login (req) {
@@ -13,7 +14,6 @@ exports.handler = async function login (req) {
                 ':accountID': req.body.email
             }
         });
-        console.log('account?', result);
         if (result && result.Items && result.Items.length) {
             let account = result.Items.filter((item) => item.accountID === req.body.email)[0];
             let stored = account.hash;
@@ -24,7 +24,7 @@ exports.handler = async function login (req) {
             }
         }
     } catch (e) {
-        console.error(e);
+        return error(e);
     }
     return {
         status: 302,
