@@ -5,18 +5,24 @@ let url = arc.http.helpers.url;
 
 async function route (req) {
     let session = await arc.http.session.read(req);
+    let cookie = await arc.http.session.write(session);
+    let location = url('/');
+    let invalid_request = { status: 400, cookie, location, type: 'application/json' };
     try {
         let note = req.body;
-        // TODO: what if body is empty?
+        if (!note) return invalid_request;
+
         note.accountID = session.account.accountID;
+        if (!note.accountID) return invalid_request;
+
         note.updated = new Date(Date.now()).toISOString();
-        // save the note
-        // TODO: consider using `update` instead of `put`
-        let result = await data.notes.put(note);
-        // log it to stdout
-        console.log(result);
+        await data.notes.put(note);
     } catch (e) {
-        console.log(e);
+        return {
+            status: 500,
+            type: 'application/json',
+            body: JSON.stringify(e)
+        };
     }
     return {
         status: 302,
